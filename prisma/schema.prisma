@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TicketStatus {
+  VALID
+  USED
+}
+
+model User {
+  id    String  @id @default(cuid())
+  name  String?
+  email String  @unique
+  image String?
+  role  Role    @default(USER)
+
+  accounts Account[]
+  tickets  Ticket[]
+}
+
+// Google hesabı bilgilerinin saklandığı kritik tablo
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  date        DateTime
+  location    String
+  category    String
+  image       String?
+  capacity    Int
+  price       Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  tickets Ticket[]
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  status       TicketStatus @default(VALID)
+  purchaseDate DateTime     @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+}

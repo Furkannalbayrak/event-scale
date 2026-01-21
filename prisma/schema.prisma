@@ -17,14 +17,15 @@ enum TicketStatus {
 }
 
 model User {
-  id    String  @id @default(cuid())
-  name  String?
-  email String  @unique
-  image String?
-  role  Role    @default(USER)
-
-  accounts Account[]
-  tickets  Ticket[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER)
+  accounts      Account[]
+  sessions      Session[] // Session hatasını bu çözer
+  tickets       Ticket[]
 }
 
 // Google hesabı bilgilerinin saklandığı kritik tablo
@@ -72,4 +73,20 @@ model Ticket {
 
   event   Event  @relation(fields: [eventId], references: [id])
   eventId String
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

@@ -1,95 +1,138 @@
-import { Button } from '@/components/ui/button';
-import { prisma } from '@/lib/prisma';
-import { Calendar, Edit, MapPin, Trash2, Users } from 'lucide-react';
-import Link from 'next/link';
-import React from 'react'
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { 
+  Users, 
+  CalendarCheck, 
+  Wallet, 
+  TrendingUp, 
+  ArrowRight, 
+  Ticket,
+  LayoutDashboard
+} from "lucide-react";
 
-async function page() {
-
-    const events = await prisma.event.findMany({
-        include: {
-            tickets: {
-                include: {
-                    user: true
-                },
-            },
-        },
-        orderBy: { date: "asc" },
+export default async function AdminDashboard() {
+  // 1. Verileri Paralel Olarak Çekiyoruz (Performans için)
+  const [userCount, events, tickets] = await Promise.all([
+    prisma.user.count(),
+    prisma.event.findMany({
+      include: { _count: { select: { tickets: true } } }
+    }),
+    prisma.ticket.findMany({
+      include: { event: true, user: true },
+      orderBy: { purchaseDate: 'desc' },
+      take: 5 // Son 5 bilet alımı
     })
+  ]);
 
-    return (
-        <div className="p-8 max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Etkinlik Yönetimi</h1>
-                    <p className="text-gray-500">Tüm etkinlikleri buradan kontrol edebilirsin.</p>
-                </div>
-                <Link href="/admin/add-event">
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                        + Yeni Etkinlik Ekle
-                    </Button>
-                </Link>
-            </div>
+  // 2. İstatistikleri Hesaplıyoruz
+  const activeEventsCount = events.filter(e => new Date(e.date) >= new Date()).length;
+  
+  const totalEarnings = events.reduce((acc, event) => {
+    return acc + (event._count.tickets * event.price);
+  }, 0);
 
-            <div className="grid gap-6">
-                {events.length === 0 ? (
-                    <div className="text-center p-20 border-2 border-dashed rounded-xl">
-                        <p className="text-gray-500">Henüz hiç etkinlik eklenmemiş.</p>
-                    </div>
-                ) : (
-                    events.map((event) => (
-                        <div key={event.id} className="bg-white border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start">
-                                <div className="space-y-2">
-                                    <h2 className="text-xl font-bold text-blue-900">{event.title}</h2>
-                                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                                        <span className="flex items-center gap-1">
-                                            <Calendar size={16} /> {new Date(event.date).toLocaleDateString("tr-TR")}
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <MapPin size={16} /> {event.location}
-                                        </span>
-                                        <span className="flex items-center gap-1 font-semibold text-green-600">
-                                            ₺{event.price}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="icon"><Edit size={18} /></Button>
-                                    <Button variant="destructive" size="icon"><Trash2 size={18} /></Button>
-                                </div>
-                            </div>
+  // En çok bilet satan etkinlik
+  const bestSellingEvent = [...events].sort((a, b) => b._count.tickets - a._count.tickets)[0];
 
-                            {/* Katılımcı Durumu ve Bilet Alanlar */}
-                            <div className="mt-6 pt-4 border-t border-gray-100">
-                                <div className="flex items-center justify-between mb-3">
-                                    <h3 className="text-sm font-bold flex items-center gap-2">
-                                        <Users size={16} /> Katılımcı Listesi
-                                        <span className="text-xs font-normal text-gray-500">
-                                            ({event.tickets.length} / {event.capacity})
-                                        </span>
-                                    </h3>
-                                </div>
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <LayoutDashboard className="text-blue-600" /> Yönetim Paneli
+        </h1>
+        <p className="text-gray-500">Platformun genel durumuna ve performansına göz atın.</p>
+      </div>
 
-                                <div className="flex flex-wrap gap-2">
-                                    {event.tickets.length > 0 ? (
-                                        event.tickets.map((ticket) => (
-                                            <div key={ticket.id} title={ticket.user.email} className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-700 border">
-                                                {ticket.user.name}
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-xs text-gray-400 italic">Henüz satış yapılmadı.</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
+      {/* Üst Kartlar: Temel İstatistikler */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-2">
+          <div className="p-2 bg-green-50 w-fit rounded-lg text-green-600"><Wallet size={24} /></div>
+          <p className="text-sm text-gray-500 font-medium">Toplam Kazanç</p>
+          <h3 className="text-2xl font-bold text-gray-900">₺{totalEarnings.toLocaleString("tr-TR")}</h3>
         </div>
-    );
 
+        <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-2">
+          <div className="p-2 bg-blue-50 w-fit rounded-lg text-blue-600"><Users size={24} /></div>
+          <p className="text-sm text-gray-500 font-medium">Toplam Kullanıcı</p>
+          <h3 className="text-2xl font-bold text-gray-900">{userCount}</h3>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-2">
+          <div className="p-2 bg-purple-50 w-fit rounded-lg text-purple-600"><CalendarCheck size={24} /></div>
+          <p className="text-sm text-gray-500 font-medium">Aktif Etkinlikler</p>
+          <h3 className="text-2xl font-bold text-gray-900">{activeEventsCount}</h3>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl border shadow-sm space-y-2">
+          <div className="p-2 bg-orange-50 w-fit rounded-lg text-orange-600"><TrendingUp size={24} /></div>
+          <p className="text-sm text-gray-500 font-medium">En Çok Satan</p>
+          <h3 className="text-lg font-bold text-gray-900 truncate">
+            {bestSellingEvent?.title || "Yok"}
+          </h3>
+        </div>
+      </div>
+
+      {/* Navigasyon Alanı */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Link href="/admin/events" className="group">
+          <div className="bg-white p-8 rounded-2xl border shadow-sm hover:border-blue-500 transition-all flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100"><Ticket size={32} /></div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-900">Etkinlikleri Yönet</h4>
+                <p className="text-sm text-gray-500">Düzenle, sil veya yeni etkinlik oluştur.</p>
+              </div>
+            </div>
+            <ArrowRight className="text-gray-300 group-hover:text-blue-600 group-hover:translate-x-2 transition-all" />
+          </div>
+        </Link>
+
+        <Link href="/admin/users" className="group">
+          <div className="bg-white p-8 rounded-2xl border shadow-sm hover:border-purple-500 transition-all flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-purple-600 text-white rounded-xl shadow-lg shadow-purple-100"><Users size={32} /></div>
+              <div>
+                <h4 className="text-xl font-bold text-gray-900">Kullanıcıları Yönet</h4>
+                <p className="text-sm text-gray-500">Kayıtlı kullanıcıları gör ve rollerini ayarla.</p>
+              </div>
+            </div>
+            <ArrowRight className="text-gray-300 group-hover:text-purple-600 group-hover:translate-x-2 transition-all" />
+          </div>
+        </Link>
+      </div>
+
+      {/* Son Bilet Alımları */}
+      <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+        <div className="p-6 border-b">
+          <h4 className="font-bold text-gray-900">Son Bilet Alımları</h4>
+        </div>
+        <div className="divide-y">
+          {tickets.length > 0 ? (
+            tickets.map((t) => (
+              <div key={t.id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">
+                    {t.user.name?.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900">{t.user.name}</p>
+                    <p className="text-xs text-gray-500">{t.event.title}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-green-600">₺{t.event.price}</p>
+                  <p className="text-[10px] text-gray-400">
+                    {new Date(t.purchaseDate).toLocaleDateString("tr-TR")}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="p-10 text-center text-gray-400 italic">Henüz bir satış gerçekleşmedi.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default page

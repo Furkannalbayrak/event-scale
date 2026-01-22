@@ -11,7 +11,10 @@ export default function AddEventPage() {
 
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
-        const date = new Date(formData.get("date") as string);
+
+        const dateStr = formData.get("date") as string;
+        const date = new Date(`${dateStr}:00.000+03:00`);
+
         const location = formData.get("location") as string;
         const category = formData.get("category") as string;
         const image = formData.get("image") as string;
@@ -32,7 +35,6 @@ export default function AddEventPage() {
             },
         });
 
-        // Kayıt bitince ana admin sayfasına yönlendir
         redirect("/admin");
     }
 

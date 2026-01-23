@@ -42,8 +42,8 @@ export default function AddEventPage() {
         <div className="min-h-screen bg-gray-50 p-6 md:p-12">
             <div className="max-w-3xl mx-auto">
                 {/* Geri Dön Butonu */}
-                <Link href="/admin" className="flex items-center text-sm text-gray-500 hover:text-blue-600 mb-6 transition-colors">
-                    <ChevronLeft size={18} /> Admin Paneline Dön
+                <Link href="/admin/events" className="flex items-center text-sm text-gray-500 hover:text-blue-600 mb-6 transition-colors">
+                    <ChevronLeft size={18} /> Etkinlik Paneline Dön
                 </Link>
 
                 <div className="bg-white rounded-2xl shadow-sm border p-8">

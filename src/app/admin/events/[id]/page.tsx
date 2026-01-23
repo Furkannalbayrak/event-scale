@@ -41,8 +41,8 @@ export default async function DetailEvent({ params }: DetailEventProps) {
             <div className="max-w-5xl mx-auto">
                 {/* Üst Menü / Navigasyon */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <Link href="/admin" className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
-                        <ChevronLeft size={18} /> Paneline Geri Dön
+                    <Link href="/admin/events" className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                        <ChevronLeft size={18} /> Etkinlik Paneline Dön
                     </Link>
                     <div className="flex gap-2">
                         <Link href={`/admin/events/${id}/edit`}>

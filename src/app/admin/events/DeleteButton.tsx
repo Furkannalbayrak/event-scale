@@ -3,13 +3,24 @@
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
 import deleteEvent from "./delete"
+import { useRouter } from "next/navigation"
 
 export function DeleteButton({ id }: { id: string }) {
-  const handleDelete = async () => {
+  const router = useRouter();
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const confirmDelete = confirm("Bu etkinliği silmek istediğinize emin misiniz?")
-    
+
     if (confirmDelete) {
-      await deleteEvent(id)
+      try {
+        await deleteEvent(id);
+        router.refresh();
+      } catch (error) {
+        alert("Silme işlemi başarısız oldu.");
+      }
     }
   }
 

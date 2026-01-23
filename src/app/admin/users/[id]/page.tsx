@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth/authSetup";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
     ChevronLeft,
     User as UserIcon,
@@ -13,8 +12,8 @@ import {
     Calendar,
     ShieldCheck
 } from "lucide-react";
-import { toggleUserRole, deleteUserAction } from "../actions";
 import { DeleteUserButton } from "../DeleteUserButton";
+import { ToggleRoleButton } from "../ToggleRoleButton";
 
 interface UserDetailProps {
     params: Promise<{ id: string }>;
@@ -70,12 +69,7 @@ export default async function UserDetailPage({ params }: UserDetailProps) {
 
                             {!isSelf ? (
                                 <div className="space-y-3 pt-6 border-t">
-                                    <form action={toggleUserRole.bind(null, user.id, user.role || "USER")}>
-                                        <Button variant="outline" className="w-full flex gap-2">
-                                            <ShieldAlert size={16} />
-                                            {user.role === "ADMIN" ? "Yetkiyi Al (USER yap)" : "ADMIN Yap"}
-                                        </Button>
-                                    </form>
+                                    <ToggleRoleButton userId={user.id} currentRole={user.role || "USER"} />
 
                                     <DeleteUserButton userId={user.id} />
                                 </div>

@@ -13,11 +13,6 @@ enum Role {
   ADMIN
 }
 
-enum TicketStatus {
-  VALID
-  USED
-}
-
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -28,8 +23,40 @@ model User {
   role          Role      @default(USER)
   accounts      Account[]
   sessions      Session[] // Session hatasını bu çözer
-  tickets       Ticket[]
+  favorites     Favorite[]
 }
+
+model Event {
+  id          String   @id @default(cuid())
+  externalId  String?
+  source      String   @default("MANUAL")
+  title       String
+  description String   @db.Text
+  date        DateTime
+  location    String
+  category    String
+  image       String?
+  capacity    Int?
+  price       Float    @default(0)
+  externalUrl String?
+  favorites   Favorite[]
+  
+  @@unique([source, externalId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  // Bir kullanıcı bir etkinliği sadece bir kez favorileyebilir
+  @@unique([userId, eventId])
+}
+
 
 // Google hesabı bilgilerinin saklandığı kritik tablo
 model Account {
@@ -51,32 +78,6 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Event {
-  id          String   @id @default(cuid())
-  title       String
-  description String   @db.Text
-  date        DateTime
-  location    String
-  category    String
-  image       String?
-  capacity    Int
-  price       Float    @default(0)
-  createdAt   DateTime @default(now())
-
-  tickets Ticket[]
-}
-
-model Ticket {
-  id           String       @id @default(cuid())
-  status       TicketStatus @default(VALID)
-  purchaseDate DateTime     @default(now())
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  event   Event  @relation(fields: [eventId], references: [id])
-  eventId String
-}
 
 model Session {
   id           String   @id @default(cuid())
@@ -93,3 +94,4 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+

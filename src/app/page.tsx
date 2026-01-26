@@ -1,11 +1,28 @@
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth/authSetup";
+import EventList from "@/components/EventList";
 
-export default function Home() {
-  console.log("DATABASE URL TEST:", process.env.DATABASE_URL); // <-- BU SATIRI EKLE
+export default async function Home() {
+  const session = await auth();
+  
+  const events = await prisma.event.findMany({
+    orderBy: {
+      date: 'asc'
+    }
+  });
 
   return (
-    <div className="text-center font-bold text-2xl mt-10">
-      Etkinlik Platformu
-      <p className="text-sm font-normal mt-4">Lütfen yukarıdan giriş yapın.</p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-800">Etkinlik Platformu</h1>
+        {!session && (
+          <p className="text-gray-600 mt-2">
+            Etkinlik detaylarını görmek için lütfen yukarıdan giriş yapın.
+          </p>
+        )}
+      </div>
+
+      <EventList events={events} isLoggedIn={!!session} />
     </div>
   );
 }

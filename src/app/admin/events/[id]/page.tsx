@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { prisma } from '@/lib/prisma';
-import { Banknote, Calendar, ChevronLeft, Clock, Edit, Mail, MapPin, Users } from 'lucide-react';
+import { Banknote, Calendar, ChevronLeft, Clock, Edit, Mail, MapPin, Heart, Globe, Info } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import React from 'react'
@@ -10,25 +10,25 @@ interface DetailEventProps {
 }
 
 export default async function DetailEvent({ params }: DetailEventProps) {
-
     const { id } = await params;
 
+    // Yeni şemaya göre 'favorites' ilişkisini çekiyoruz
     const event = await prisma.event.findUnique({
         where: { id: id },
         include: {
-            tickets: {
+            favorites: {
                 include: {
-                    user: true // bilet sahibi kullanıcı bilgileri
-                }
+                    user: true // Etkinliği favorileyen kullanıcı bilgileri
+                },
+                orderBy: { createdAt: 'desc' }
             }
         }
     })
 
     if (!event) {
-        redirect("/admin");
+        redirect("/admin/events");
     }
 
-    // Tarih ve saat formatlama (Türkiye saatiyle uyumlu)
     const eventDate = new Date(event.date).toLocaleDateString("tr-TR", {
         day: "numeric", month: "long", year: "numeric"
     });
@@ -39,14 +39,13 @@ export default async function DetailEvent({ params }: DetailEventProps) {
     return (
         <div className="min-h-screen bg-gray-50 p-6 md:p-12">
             <div className="max-w-5xl mx-auto">
-                {/* Üst Menü / Navigasyon */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                    <Link href="/admin/events" className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                    <Link href="/admin/events" className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors font-medium">
                         <ChevronLeft size={18} /> Etkinlik Paneline Dön
                     </Link>
                     <div className="flex gap-2">
                         <Link href={`/admin/events/${id}/edit`}>
-                            <Button variant="outline" className="flex gap-2">
+                            <Button variant="outline" className="flex gap-2 rounded-xl border-blue-200 text-blue-700 hover:bg-blue-50">
                                 <Edit size={16} /> Düzenle
                             </Button>
                         </Link>
@@ -54,91 +53,112 @@ export default async function DetailEvent({ params }: DetailEventProps) {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* SOL KOLON: Etkinlik Detayları */}
+                    {/* SOL KOLON: Detaylar */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white rounded-2xl shadow-sm border p-8">
-                            <div className="flex items-center gap-2 mb-4">
-                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <div className="bg-white rounded-3xl shadow-sm border p-8">
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
                                     {event.category}
                                 </span>
+                                {event.source === "IBB" && (
+                                    <span className="flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                        <Globe size={10} /> İBB Verisi
+                                    </span>
+                                )}
                             </div>
-                            <h1 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h1>
+                            <h1 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">{event.title}</h1>
                             <p className="text-gray-600 leading-relaxed mb-8">
                                 {event.description}
                             </p>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-100">
                                 <div className="flex items-center gap-3 text-gray-700">
-                                    <div className="p-2 bg-gray-100 rounded-lg"><Calendar size={20} /></div>
+                                    <div className="p-3 bg-gray-50 rounded-2xl text-blue-600"><Calendar size={20} /></div>
                                     <div>
-                                        <p className="text-xs text-gray-400">Tarih</p>
-                                        <p className="font-medium">{eventDate}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Tarih</p>
+                                        <p className="font-semibold">{eventDate}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-gray-700">
-                                    <div className="p-2 bg-gray-100 rounded-lg"><Clock size={20} /></div>
+                                    <div className="p-3 bg-gray-50 rounded-2xl text-blue-600"><Clock size={20} /></div>
                                     <div>
-                                        <p className="text-xs text-gray-400">Saat</p>
-                                        <p className="font-medium">{eventTime}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Saat</p>
+                                        <p className="font-semibold">{eventTime}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-gray-700">
-                                    <div className="p-2 bg-gray-100 rounded-lg"><MapPin size={20} /></div>
+                                    <div className="p-3 bg-gray-50 rounded-2xl text-blue-600"><MapPin size={20} /></div>
                                     <div>
-                                        <p className="text-xs text-gray-400">Mekan</p>
-                                        <p className="font-medium">{event.location}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Mekan</p>
+                                        <p className="font-semibold">{event.location}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 text-gray-700">
-                                    <div className="p-2 bg-gray-100 rounded-lg"><Banknote size={20} /></div>
+                                    <div className="p-3 bg-gray-50 rounded-2xl text-green-600"><Banknote size={20} /></div>
                                     <div>
-                                        <p className="text-xs text-gray-400">Bilet Fiyatı</p>
-                                        <p className="font-medium text-green-600">₺{event.price}</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Bilet Fiyatı</p>
+                                        <p className="font-semibold text-green-600">₺{event.price}</p>
                                     </div>
                                 </div>
                             </div>
+                            
+                            {event.externalUrl && (
+                                <div className="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
+                                    <div className="flex items-center gap-3 text-blue-800">
+                                        <Info size={20} />
+                                        <span className="text-sm font-medium">Bu etkinlik dış kaynağa yönlendirilmiştir.</span>
+                                    </div>
+                                    <a href={event.externalUrl} target="_blank" className="text-xs font-bold text-blue-600 hover:underline">Kaynağı Gör →</a>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Katılımcı Tablosu */}
-                        <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                        {/* Favorileyenler Tablosu */}
+                        <div className="bg-white rounded-3xl shadow-sm border overflow-hidden">
                             <div className="p-6 border-b flex justify-between items-center bg-gray-50/50">
                                 <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                                    <Users size={18} /> Katılımcı Listesi
+                                    <Heart size={18} className="text-pink-500" fill="currentColor" /> İlgilenen Kullanıcılar
                                 </h2>
-                                <span className="text-sm font-medium text-gray-500">
-                                    {event.tickets.length} Kayıt
+                                <span className="text-xs font-bold text-gray-500 bg-white px-3 py-1 rounded-full border">
+                                    {event.favorites.length} Favori
                                 </span>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
-                                    <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+                                    <thead className="bg-gray-50 text-[10px] uppercase text-gray-400 font-bold tracking-widest">
                                         <tr>
                                             <th className="px-6 py-4">Kullanıcı</th>
-                                            <th className="px-6 py-4">E-posta</th>
-                                            <th className="px-6 py-4 text-right">Alım Tarihi</th>
+                                            <th className="px-6 py-4">İletişim</th>
+                                            <th className="px-6 py-4 text-right">Favorileme Tarihi</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y">
-                                        {event.tickets.length > 0 ? (
-                                            event.tickets.map((ticket) => (
-                                                <tr key={ticket.id} className="hover:bg-gray-50 transition-colors">
-                                                    <td className="px-6 py-4 font-medium text-gray-900">
-                                                        {ticket.user.name || "İsimsiz Kullanıcı"}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-gray-600 text-sm">
-                                                        <div className="flex items-center gap-1">
-                                                            <Mail size={14} /> {ticket.user.email}
+                                    <tbody className="divide-y divide-gray-50">
+                                        {event.favorites.length > 0 ? (
+                                            event.favorites.map((fav) => (
+                                                <tr key={fav.id} className="hover:bg-gray-50/50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
+                                                                {fav.user.name?.charAt(0)}
+                                                            </div>
+                                                            <span className="font-semibold text-gray-900 text-sm">{fav.user.name}</span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 text-right text-gray-500 text-xs">
-                                                        {new Date(ticket.purchaseDate).toLocaleDateString("tr-TR")}
+                                                    <td className="px-6 py-4 text-gray-500 text-sm">
+                                                        <div className="flex items-center gap-1">
+                                                            <Mail size={14} className="text-gray-300" /> {fav.user.email}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right text-gray-400 text-xs">
+                                                        {new Date(fav.createdAt).toLocaleDateString("tr-TR")}
                                                     </td>
                                                 </tr>
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan={3} className="px-6 py-12 text-center text-gray-400 italic">
-                                                    Henüz bilet alan katılımcı bulunmuyor.
+                                                <td colSpan={3} className="px-6 py-16 text-center">
+                                                    <Heart size={32} className="mx-auto text-gray-100 mb-3" />
+                                                    <p className="text-gray-400 text-sm italic">Henüz bu etkinliği favorileyen kimse yok.</p>
                                                 </td>
                                             </tr>
                                         )}
@@ -148,30 +168,31 @@ export default async function DetailEvent({ params }: DetailEventProps) {
                         </div>
                     </div>
 
-                    {/* SAĞ KOLON: İstatistik Özetleri */}
+                    {/* SAĞ KOLON: İstatistikler */}
                     <div className="space-y-6">
-                        <div className="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-100">
-                            <p className="text-blue-100 text-sm mb-1 uppercase tracking-wider font-semibold">Toplam Hasılat</p>
-                            <h3 className="text-3xl font-bold">₺{(event.tickets.length * event.price).toLocaleString("tr-TR")}</h3>
-                            <div className="mt-4 pt-4 border-t border-blue-500/50 text-xs text-blue-100">
-                                * Bilet başına ₺{event.price} üzerinden hesaplanmıştır.
-                            </div>
+                        <div className="bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl p-8 text-white shadow-xl shadow-pink-100 relative overflow-hidden">
+                            <Heart className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 -rotate-12" fill="currentColor" />
+                            <p className="text-pink-100 text-[10px] mb-1 uppercase tracking-widest font-bold">Popülerlik Skoru</p>
+                            <h3 className="text-4xl font-bold">{event.favorites.length}</h3>
+                            <p className="mt-2 text-sm text-pink-100">Kişi bu etkinliği takip ediyor.</p>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-6 border shadow-sm">
-                            <p className="text-gray-400 text-xs mb-1 uppercase tracking-wider font-semibold">Doluluk Oranı</p>
-                            <div className="flex items-end gap-2">
-                                <h3 className="text-2xl font-bold">{((event.tickets.length / event.capacity) * 100).toFixed(1)}%</h3>
-                                <p className="text-sm text-gray-500 pb-1">/ {event.capacity} Kapasite</p>
+                        {event.capacity && (
+                            <div className="bg-white rounded-3xl p-6 border shadow-sm">
+                                <p className="text-gray-400 text-[10px] mb-2 uppercase tracking-widest font-bold">Kapasite Durumu</p>
+                                <div className="flex items-end gap-2 mb-4">
+                                    <h3 className="text-2xl font-bold text-slate-800">{event.capacity}</h3>
+                                    <p className="text-xs text-gray-400 pb-1">Kişilik Kontenjan</p>
+                                </div>
+                                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                    <div
+                                        className="bg-blue-500 h-full rounded-full transition-all duration-1000"
+                                        style={{ width: `${Math.min((event.favorites.length / event.capacity) * 100, 100)}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-3 italic">* Favori sayısı üzerinden ilgi oranıdır.</p>
                             </div>
-                            {/* İlerleme Çubuğu */}
-                            <div className="w-full bg-gray-100 h-2 mt-4 rounded-full overflow-hidden">
-                                <div
-                                    className="bg-blue-500 h-full rounded-full transition-all duration-1000"
-                                    style={{ width: `${(event.tickets.length / event.capacity) * 100}%` }}
-                                ></div>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

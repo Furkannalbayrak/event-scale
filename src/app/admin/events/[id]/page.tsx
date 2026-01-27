@@ -176,23 +176,6 @@ export default async function DetailEvent({ params }: DetailEventProps) {
                             <h3 className="text-4xl font-bold">{event.favorites.length}</h3>
                             <p className="mt-2 text-sm text-pink-100">Kişi bu etkinliği takip ediyor.</p>
                         </div>
-
-                        {event.capacity && (
-                            <div className="bg-white rounded-3xl p-6 border shadow-sm">
-                                <p className="text-gray-400 text-[10px] mb-2 uppercase tracking-widest font-bold">Kapasite Durumu</p>
-                                <div className="flex items-end gap-2 mb-4">
-                                    <h3 className="text-2xl font-bold text-slate-800">{event.capacity}</h3>
-                                    <p className="text-xs text-gray-400 pb-1">Kişilik Kontenjan</p>
-                                </div>
-                                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                    <div
-                                        className="bg-blue-500 h-full rounded-full transition-all duration-1000"
-                                        style={{ width: `${Math.min((event.favorites.length / event.capacity) * 100, 100)}%` }}
-                                    ></div>
-                                </div>
-                                <p className="text-[10px] text-gray-400 mt-3 italic">* Favori sayısı üzerinden ilgi oranıdır.</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

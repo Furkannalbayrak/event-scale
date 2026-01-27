@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth/authSetup";
-import EventList from "@/components/EventList";
+import EventsFilterContainer from "@/components/EventsFilterContainer";
 
 export default async function Home() {
   const session = await auth();
   
+  // Tarih sıralamasına göre tüm etkinlikleri çekiyoruz
   const events = await prisma.event.findMany({
     orderBy: {
       date: 'asc'
@@ -12,17 +13,20 @@ export default async function Home() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-gray-800">Etkinlik Platformu</h1>
-        {!session && (
-          <p className="text-gray-600 mt-2">
-            Etkinlik detaylarını görmek için lütfen yukarıdan giriş yapın.
-          </p>
-        )}
-      </div>
+    <div className="container mx-auto px-4 py-8 pb-32">
+      {!session && (
+          <div className="text-center mb-6">
+             <p className="text-gray-600">
+               Etkinlik detaylarını görmek için lütfen yukarıdan giriş yapın.
+             </p>
+          </div>
+      )}
 
-      <EventList events={events} isLoggedIn={!!session} />
+      {/* Filtreleme ve Listeleme Bileşeni */}
+      <EventsFilterContainer 
+        initialEvents={JSON.parse(JSON.stringify(events))} // Date objelerini güvenli geçirmek için
+        isLoggedIn={!!session} 
+      />
     </div>
   );
 }

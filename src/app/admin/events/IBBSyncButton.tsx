@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export function SyncButton() {
+export function IBBSyncButton() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 

@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Clock, Edit, MapPin, Heart, Globe, AlertCircle } f
 import Link from 'next/link';
 import React from 'react'
 import { DeleteButton } from './DeleteButton';
-import { SyncButton } from './SyncButton';
+import { IBBSyncButton } from './IBBSyncButton';
 
 async function page() {
     const events = await prisma.event.findMany({
@@ -28,7 +28,7 @@ async function page() {
                 </div>
 
                 <div className="flex gap-3">
-                    <SyncButton />
+                    <IBBSyncButton />
                     <Link href="/admin/events/add-event">
                         <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm">
                             + Manuel Ekle
@@ -68,7 +68,7 @@ async function page() {
                                                 <AlertCircle size={12} /> TÜKENDİ
                                             </span>
                                         )}
-                                        
+
                                         {event.source === "IBB" && (
                                             <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase tracking-tighter border border-blue-100">
                                                 <Globe size={10} /> İBB

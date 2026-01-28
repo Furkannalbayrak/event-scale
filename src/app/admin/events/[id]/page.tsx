@@ -101,7 +101,7 @@ export default async function DetailEvent({ params }: DetailEventProps) {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {event.externalUrl && (
                                 <div className="mt-8 p-4 bg-blue-50 rounded-2xl flex items-center justify-between">
                                     <div className="flex items-center gap-3 text-blue-800">
@@ -137,12 +137,16 @@ export default async function DetailEvent({ params }: DetailEventProps) {
                                             event.favorites.map((fav) => (
                                                 <tr key={fav.id} className="hover:bg-gray-50/50 transition-colors">
                                                     <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
-                                                                {fav.user.name?.charAt(0)}
+                                                        <Link href={`/admin/users/${fav.user.id}`}>
+                                                            <div className="flex items-center gap-3 group cursor-pointer">
+                                                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                                                                    {fav.user.name?.charAt(0)}
+                                                                </div>
+                                                                <span className="font-semibold text-gray-900 text-sm group-hover:text-blue-600 transition-colors underline-offset-4 group-hover:underline">
+                                                                    {fav.user.name}
+                                                                </span>
                                                             </div>
-                                                            <span className="font-semibold text-gray-900 text-sm">{fav.user.name}</span>
-                                                        </div>
+                                                        </Link>
                                                     </td>
                                                     <td className="px-6 py-4 text-gray-500 text-sm">
                                                         <div className="flex items-center gap-1">

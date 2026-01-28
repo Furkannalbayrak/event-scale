@@ -37,15 +37,15 @@ async function page() {
                 </div>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {events.length === 0 ? (
-                    <div className="text-center p-20 border-2 border-dashed rounded-3xl bg-gray-50/50">
+                    <div className="col-span-1 lg:col-span-2 text-center p-20 border-2 border-dashed rounded-3xl bg-gray-50/50">
                         <p className="text-gray-500 font-medium text-lg">Henüz hiç etkinlik bulunmuyor.</p>
                     </div>
                 ) : (
                     events.map((event) => (
                         /* Kartın kendisini 'relative' yapıyoruz */
-                        <div key={event.id} className="group bg-white border rounded-2xl p-6 shadow-sm hover:border-blue-200 hover:shadow-md transition-all relative overflow-hidden">
+                        <div key={event.id} className="group bg-white border rounded-2xl p-6 shadow-sm hover:border-blue-200 hover:shadow-md transition-all relative overflow-hidden flex flex-col h-full">
 
                             {/* OVERLAY LINK: Tüm kartı kaplayan hayali link */}
                             <Link
@@ -54,44 +54,44 @@ async function page() {
                                 aria-label={`${event.title} detaylarını gör`}
                             />
 
-                            <div className="flex justify-between items-start relative z-10 pointer-events-none">
+                            <div className="flex flex-col sm:flex-row justify-between items-start relative z-10 pointer-events-none gap-4 sm:gap-0 flex-1">
                                 {/* pointer-events-none ile tıklamanın alttaki overlay linke geçmesini sağlıyoruz */}
-                                <div className="flex-1 space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <h2 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                <div className="flex-1 space-y-3 w-full min-w-0">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <h2 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                                             {event.title}
                                         </h2>
 
                                         {/* TÜKENDİ BADGE - İBB stili */}
                                         {event.capacity === 0 && (
-                                            <span className="flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-600 text-[10px] font-black rounded-lg border border-rose-200 uppercase tracking-wider animate-pulse">
+                                            <span className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-600 text-[10px] font-black rounded-lg border border-rose-200 uppercase tracking-wider animate-pulse">
                                                 <AlertCircle size={12} /> TÜKENDİ
                                             </span>
                                         )}
 
                                         {event.source === "IBB" && (
-                                            <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase tracking-tighter border border-blue-100">
+                                            <span className="flex-shrink-0 flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full uppercase tracking-tighter border border-blue-100">
                                                 <Globe size={10} /> İBB
                                             </span>
                                         )}
                                     </div>
 
-                                    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg">
-                                            <Calendar size={14} className="text-blue-500" /> {new Date(event.date).toLocaleDateString("tr-TR")}
+                                    <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg max-w-full truncate">
+                                            <Calendar size={14} className="text-blue-500 flex-shrink-0" /> {new Date(event.date).toLocaleDateString("tr-TR")}
                                         </span>
                                         <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg">
-                                            <Clock size={14} className="text-blue-500" />
+                                            <Clock size={14} className="text-blue-500 flex-shrink-0" />
                                             {new Date(event.date).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
                                         </span>
-                                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg">
-                                            <MapPin size={14} className="text-blue-500" /> {event.location}
+                                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg max-w-full truncate">
+                                            <MapPin size={14} className="text-blue-500 flex-shrink-0" /> <span className="truncate">{event.location}</span>
                                         </span>
                                     </div>
                                 </div>
 
                                 {/* BUTONLAR: z-20 ve pointer-events-auto ile linkin üstünde çalışmasını sağlıyoruz */}
-                                <div className="flex gap-2 ml-4 relative z-20 pointer-events-auto">
+                                <div className="flex gap-2 sm:ml-4 relative z-20 pointer-events-auto self-end sm:self-start shrink-0">
                                     <Link href={`/admin/events/${event.id}/edit`}>
                                         <Button variant="outline" size="icon" className="rounded-xl"><Edit size={18} /></Button>
                                     </Link>
@@ -99,7 +99,7 @@ async function page() {
                                 </div>
                             </div>
 
-                            <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between relative z-10 pointer-events-none">
+                            <div className="mt-6 pt-4 border-t border-gray-50 flex flex-wrap items-center justify-between relative z-10 pointer-events-none gap-3">
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 text-pink-600 rounded-xl border border-pink-100">
                                         <Heart size={16} fill="currentColor" className="opacity-80" />

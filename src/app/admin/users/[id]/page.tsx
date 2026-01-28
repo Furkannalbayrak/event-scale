@@ -39,7 +39,7 @@ export default async function UserDetailPage({ params }: UserDetailProps) {
     const isSelf = session?.user?.id === user.id;
 
     return (
-        <div className="min-h-screen bg-gray-50/50 p-6 md:p-12 font-sans">
+        <div className="min-h-screen bg-gray-50/50 p-5 md:p-12 font-sans">
             <div className="max-w-5xl mx-auto">
                 {/* Üst Navigasyon - Daha yumuşak */}
                 <Link href="/admin/users" className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 mb-8 transition-colors bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md">
@@ -98,7 +98,7 @@ export default async function UserDetailPage({ params }: UserDetailProps) {
 
                     {/* SAĞ PANEL: Favori Etkinlikler - Yumuşatılmış Liste */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white border border-gray-100 rounded-[2rem] p-8 shadow-sm">
+                        <div className="bg-white border border-gray-100 rounded-[2rem] p-4 shadow-sm">
                             <h2 className="text-xl font-bold text-gray-800 mb-8 flex items-center gap-3">
                                 <div className="p-3 bg-pink-50 text-pink-500 rounded-full">
                                     <Heart size={20} fill="currentColor" />

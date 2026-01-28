@@ -17,17 +17,16 @@ export default async function UsersPage() {
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">
       {/* Üst Başlık Alanı */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <Link href="/admin" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1 mb-2 transition-colors">
             <ArrowLeft size={16} /> Dashboard'a Dön
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-2">
             <Users className="text-purple-600" /> Kullanıcı Yönetimi
           </h1>
-          <p className="text-gray-500">Sistemdeki tüm kullanıcılar. Satırın herhangi bir yerine tıklayarak detaylara gidebilirsiniz.</p>
         </div>
-        <div className="bg-purple-50 px-4 py-2 rounded-xl border border-purple-100">
+        <div className="bg-purple-50 px-4 py-2 rounded-xl border border-purple-100 self-start md:self-auto">
           <span className="text-purple-700 font-bold">{users.length}</span> <span className="text-purple-600 text-sm">Toplam Üye</span>
         </div>
       </div>

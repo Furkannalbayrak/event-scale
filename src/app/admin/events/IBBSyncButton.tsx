@@ -31,7 +31,7 @@ export function IBBSyncButton() {
       className="border-blue-200 text-blue-600 hover:bg-blue-50 transition-colors"
     >
       <RefreshCw size={18} className={`mr-2 ${loading ? "animate-spin" : ""}`} />
-      {loading ? "Veriler Çekiliyor..." : "İBB Verilerini Güncelle"}
+      {loading ? "Veriler Çekiliyor..." : "Veri Güncelle"}
     </Button>
   );
 }

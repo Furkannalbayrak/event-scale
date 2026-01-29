@@ -31,4 +31,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: npx ts-node scripts/sync-manual.ts
+        run: npx ts-node --esm scripts/sync-manual.ts

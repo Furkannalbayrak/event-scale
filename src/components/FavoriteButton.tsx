@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Heart } from "lucide-react";
+import { useState } from "react";
+import { Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toggleFavoriteAction } from "@/app/favorite/favorite";
-import { useFavoriteStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
 interface FavoriteButtonProps {
   eventId: string;
@@ -13,37 +13,29 @@ interface FavoriteButtonProps {
 }
 
 export default function FavoriteButton({ eventId, initialIsFavorite = false }: FavoriteButtonProps) {
-  const { favoriteIds, addFavorite, removeFavorite, toggleFavorite } = useFavoriteStore();
-  const isFavorite = favoriteIds.includes(eventId);
-
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    if (initialIsFavorite) {
-      addFavorite(eventId);
-    }
-  }, [eventId, initialIsFavorite, addFavorite]);
+  const [loading, setLoading] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const router = useRouter();
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
+    if (loading) return;
 
-    const wasFavorite = isFavorite;
-    toggleFavorite(eventId);
+    const newState = !isFavorite;
+    setIsFavorite(newState);
+    setLoading(true);
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    try {
+      await toggleFavoriteAction(eventId);
+      
+      router.refresh(); 
+    } catch (error) {
+      // Hata olursa geri al
+      setIsFavorite(!newState);
+      console.error("Hata:", error);
+    } finally {
+      setLoading(false);
     }
-
-    timerRef.current = setTimeout(async () => {
-      try {
-        // Sadece son durumu sunucuya bildiriyoruz
-        await toggleFavoriteAction(eventId);
-        console.log("💾 Veritabanı başarıyla senkronize edildi.");
-      } catch (error) {
-        console.error("Senkronizasyon hatası:", error);
-      }
-    }, 1000);
   };
 
   return (
@@ -51,21 +43,27 @@ export default function FavoriteButton({ eventId, initialIsFavorite = false }: F
       variant="outline"
       size="icon"
       onClick={handleToggle}
+      disabled={loading}
       className={cn(
         "rounded-full w-12 h-12 border-2 shadow-sm transition-all duration-300 group",
         isFavorite
           ? "border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300"
-          : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300"
+          : "border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300",
+        loading && "opacity-70"
       )}
     >
-      <Heart
-        className={cn(
-          "w-5 h-5 transition-transform duration-300",
-          isFavorite
-            ? "fill-red-500 text-red-500 scale-110"
-            : "text-gray-400 group-hover:text-red-400 scale-100"
-        )}
-      />
+      {loading ? (
+        <Loader2 className="w-5 h-5 animate-spin text-red-400" />
+      ) : (
+        <Heart
+          className={cn(
+            "w-5 h-5 transition-transform duration-300",
+            isFavorite
+              ? "fill-red-500 text-red-500 scale-110"
+              : "text-gray-400 group-hover:text-red-400 scale-100"
+          )}
+        />
+      )}
     </Button>
   );
 }

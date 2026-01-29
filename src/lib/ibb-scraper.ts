@@ -52,7 +52,15 @@ export async function scrapeAndSyncIBB() {
     for (const { url, monthIndex } of sources) {
       console.log(`📅 Ay index taranıyor: ${monthIndex}`);
 
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+          "Accept-Language": "tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7"
+        }
+      });
+
       const html = await res.text();
       const $ = cheerio.load(html);
 

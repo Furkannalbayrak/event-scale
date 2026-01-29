@@ -4,7 +4,7 @@ import * as cheerio from "cheerio";
 /* ---------------------------------- */
 /* 💰 AKILLI FİYAT HESABI */
 /* ---------------------------------- */
-const calculateSmartPrice = (title: string, location: string): number => {
+export const calculateSmartPrice = (title: string, location: string): number => {
   const t = title.toLowerCase();
   const l = location.toLowerCase();
 

@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build ve Test Kontrolü
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      # NextAuth build alırken bu değerlere ihtiyaç duyabilir, rastgele değerler verebiliriz test için
+      AUTH_SECRET: "sanal-test-secret-key-123"
+      AUTH_GOOGLE_ID: "mock-google-id"
+      AUTH_GOOGLE_SECRET: "mock-google-secret"
+
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v4
+
+      - name: Node.js Kurulumu
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Bağımlılıkları Yükle
+        run: npm ci
+
+      - name: Prisma Generate
+        run: npx prisma generate
+
+      - name: Lint Kontrolü (Kod Kalitesi)
+        run: npm run lint
+
+       # ARTIK BURASI AÇIK VE AKTİF!
+      - name: Testleri Çalıştır
+        run: npm test
+
+      - name: Build Denemesi
+        run: npm run build
+
+         # YENİ EKLENECEK KISIM:
+      - name: Docker Build Kontrolü
+        run: docker build . --file Dockerfile --tag event-scale-test

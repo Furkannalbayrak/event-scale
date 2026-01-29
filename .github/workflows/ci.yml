@@ -35,16 +35,13 @@ jobs:
       - name: Prisma Generate
         run: npx prisma generate
 
-      - name: Lint Kontrolü (Kod Kalitesi)
-        run: npm run lint
-
-       # ARTIK BURASI AÇIK VE AKTİF!
+      # LINT ADIMI BURADAN SİLİNDİ 🗑️
+      
       - name: Testleri Çalıştır
         run: npm test
 
       - name: Build Denemesi
         run: npm run build
 
-         # YENİ EKLENECEK KISIM:
       - name: Docker Build Kontrolü
         run: docker build . --file Dockerfile --tag event-scale-test

@@ -9,7 +9,7 @@ export const calculateSmartPrice = (title: string, location: string): number => 
   const l = location.toLowerCase();
 
   if (l.includes("harbiye cemil topuzlu")) {
-    if (t.includes("müzikal")) return 450;
+    if (t.includes("müzikal")) return 4500;
     if (t.includes("çocuk")) return 80;
     return 400;
   }

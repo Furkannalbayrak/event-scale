@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  web-app:
+    build: .
+    container_name: ibb-scraper-container
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app           # Mevcut klasörü konteynerdeki /app'e bağla
+      - /app/node_modules # Konteynerin kendi kütüphanelerini koru
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    # 👇 Geliştirme aşamasında 'npm start' yerine 'npm run dev' kullanmalısın
+    command: npm run dev 
+    restart: always

@@ -9,6 +9,7 @@ services:
     volumes:
       - .:/app           # Mevcut klasörü konteynerdeki /app'e bağla
       - /app/node_modules # Konteynerin kendi kütüphanelerini koru
+      - /app/.next
     env_file:
       - .env
     environment:

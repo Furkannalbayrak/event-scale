@@ -1,3 +1,7 @@
+jest.mock('cheerio', () => ({
+  load: jest.fn(),
+}));
+
 import { calculateSmartPrice } from '../lib/ibb-scraper';
 
 describe('Akıllı Fiyatlandırma Sistemi (Smart Pricing)', () => {

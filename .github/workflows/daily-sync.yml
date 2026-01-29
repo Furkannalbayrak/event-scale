@@ -1,0 +1,37 @@
+name: Daily IBB Sync
+
+on:
+  schedule:
+    # Her gün saat 04:00'te (UTC) çalışır (Türkiye saatiyle 07:00)
+    - cron: '0 4 * * *'
+  # Manuel olarak tetiklemek isterseniz:
+  workflow_dispatch:
+
+jobs:
+  sync-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v4
+
+      - name: Node.js Kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Bağımlılıkları Yükle
+        run: npm ci
+        working-directory: ./event-scale
+
+      - name: Prisma Client Oluştur
+        run: npx prisma generate
+        working-directory: ./event-scale
+
+      - name: Senkronizasyon Scriptini Çalıştır
+        working-directory: ./event-scale
+        env:
+          # GitHub Secrets kısmına bu değerleri eklemelisiniz!
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx ts-node scripts/sync-manual.ts

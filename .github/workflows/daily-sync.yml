@@ -20,18 +20,15 @@ jobs:
         with:
           node-version: 20
 
+      # working-directory satırlarını kaldırdık
       - name: Bağımlılıkları Yükle
         run: npm ci
-        working-directory: ./event-scale
 
       - name: Prisma Client Oluştur
         run: npx prisma generate
-        working-directory: ./event-scale
 
       - name: Senkronizasyon Scriptini Çalıştır
-        working-directory: ./event-scale
         env:
-          # GitHub Secrets kısmına bu değerleri eklemelisiniz!
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
         run: npx ts-node scripts/sync-manual.ts

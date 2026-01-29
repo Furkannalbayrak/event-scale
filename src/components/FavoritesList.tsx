@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { Calendar, Heart, MapPin, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FavoriteButton from "@/components/FavoriteButton";
-import { useFavoriteStore } from "@/lib/store";
 import { Prisma } from "@prisma/client";
 
 type FavoriteWithEvent = Prisma.FavoriteGetPayload<{ include: { event: true } }>
@@ -15,16 +13,8 @@ interface FavoritesListProps {
 }
 
 export default function FavoritesList({ initialFavorites }: FavoritesListProps) {
-  const { favoriteIds, setFavorites } = useFavoriteStore();
 
-  useEffect(() => {
-    const ids = initialFavorites.map((fav) => fav.event.id);
-    setFavorites(ids);
-  }, [initialFavorites, setFavorites]);
-
-  const visibleFavorites = initialFavorites.filter(fav => favoriteIds.includes(fav.event.id));
-
-  if (visibleFavorites.length === 0) {
+  if (initialFavorites.length === 0) {
     return (
       <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -43,7 +33,7 @@ export default function FavoritesList({ initialFavorites }: FavoritesListProps) 
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {visibleFavorites.map((fav) => {
+      {initialFavorites.map((fav) => {
         const event = fav.event;
         const eventDate = new Date(event.date);
 

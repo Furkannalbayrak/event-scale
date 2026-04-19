@@ -3,7 +3,7 @@ name: Daily IBB Sync
 on:
   schedule:
     # Her gün saat 04:00'te (UTC) çalışır (Türkiye saatiyle 07:00)
-    - cron: '0 4 * * *'
+    # - cron: '0 4 * * *'
   # Manuel olarak tetiklemek isterseniz:
   workflow_dispatch:
 

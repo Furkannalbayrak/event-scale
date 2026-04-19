@@ -41,6 +41,7 @@ Event Scale, hem yerleşik olarak İBB (İstanbul Büyükşehir Belediyesi) etki
 │   ├── lib/                # Yardımcı fonksiyonlar, Prisma Client, İBB Scraper
 │   ├── tests/              # Jest ile yazılmış test dosyaları testleri
 │   └── types/              # TypeScript tip tanımlamaları
+```
 
 ## ⚙️ Kurulum ve Çalıştırma
 
